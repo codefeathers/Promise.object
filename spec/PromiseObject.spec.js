@@ -1,76 +1,96 @@
 'use strict';
 
-Promise.object = require('../es5/index.min.js');
-
-// Simple object
-const testObject1 = {
-	foo: Promise.resolve(1),
-	bar: {
-		foobar: Promise.resolve(2),
-	},
-};
-
-const resolvedObject1 = {
-	foo: 1,
-	bar: {
-		foobar: 2
-	},
-};
-
-// Nested promises with circular reference
-const testObject2 = {
-	foo: Promise.resolve(1),
-	bar: {
-		foobar: Promise.resolve(2)
-	},
-	baz: [ 1, "two", Promise.resolve(3) ],
-};
-
-testObject2.link1 = testObject2;
-testObject2.link2 = { link3: testObject2 };
-
-const resolvedObject2 = {
-	foo: 1,
-	bar: {
-		foobar: 2,
-	},
-	baz: [ 1, "two", 3 ],
-};
-
-resolvedObject2.link1 = resolvedObject2;
-resolvedObject2.link2 = { link3: resolvedObject2 };
-
-// Deeply nested promises
-const testObject3 = Promise.resolve({
-	foo: Promise.resolve({
-		bar: Promise.resolve(
-			Promise.resolve(5)
-		),
-	}),
-});
-
-const resolvedObject3 = {
-	foo: {
-		bar: 5,
-	},
-};
+const expect = require("chai").expect;
+Promise.object = require('../index.js');
 
 /* global describe it expect */
 describe("Promise.object", () => {
 
-	it("Should resolve simple objects with promises", () => {
-		return Promise.object(testObject1)
-			.then(obj => expect(obj).toEqual(resolvedObject1));
-	});
+	// it("Should resolve promises in a simple object", () => {
+	// 	const test = {
+	// 		foo: Promise.resolve(1),
+	// 		bar: {
+	// 			foobar: Promise.resolve(2),
+	// 		},
+	// 	};
 
-	it("Should resolve objects with arrays and promises", () => {
-		return Promise.object(testObject2)
-			.then(obj => expect(obj).toEqual(resolvedObject2));
-	});
+	// 	const resolved = {
+	// 		foo: 1,
+	// 		bar: {
+	// 			foobar: 2
+	// 		},
+	// 	};
+	// 	return Promise.object(test)
+	// 		.then(obj => expect(obj).to.deep.equal(resolved));
+	// });
 
-	it("Should resolve nested promise structures", () => {
-		return Promise.object(testObject3)
-			.then(obj => expect(obj).toEqual(resolvedObject3));
-	});
+	it("Should resolve nested promises with circular references", () => {
+		const test = {
+			foo: Promise.resolve(1),
+			bar: {
+				foobar: Promise.resolve(2)
+			},
+			baz: [ 1, "two", Promise.resolve(3) ],
+		};
+
+		test.link1 = test;
+		test.link2 = { link3: test };
+
+		const resolved = {
+			foo: 1,
+			bar: {
+				foobar: 2,
+			},
+			baz: [ 1, "two", 3 ],
+		};
+
+		resolved.link1 = resolved;
+		resolved.link2 = { link3: resolved };
+
+		return Promise.object(test)
+			.then(obj => (console.log({obj}), expect(obj).to.deep.equal(resolved)));
+	})
+
+	// it("Should resolve deeply nested promises", () => {
+	// 	const test = Promise.resolve({
+	// 		foo: Promise.resolve({
+	// 			bar: Promise.resolve(
+	// 				Promise.resolve(5)
+	// 			),
+	// 		}),
+	// 	});
+
+	// 	const resolved = {
+	// 		foo: {
+	// 			bar: 5,
+	// 		},
+	// 	};
+
+	// 	return Promise.object(test)
+	// 		.then(obj => expect(obj).to.deep.equal(resolved));
+	// });
+
+	// it("Should resolve toplevel arrays", () => {
+	// 	return Promise.object([
+	// 		Promise.resolve(1),
+	// 		2,
+	// 		Promise.resolve(3)
+	// 	]).then(obj => expect(obj).to.deep.equal([
+	// 		1,
+	// 		2,
+	// 		3
+	// 	]));
+	// });
+
+	// it("Should resolve cyclic arrays", () => {
+	// 	const arr = [];
+	// 	arr.push(arr);
+	// 	arr.push(Promise.resolve(arr));
+	// 	Promise.object(arr).then(arr => {
+	// 		return expect(
+	// 			arr[0] === arr && arr[1] === arr
+	// 		).to.be.true;
+	// 	});
+	// });
 
 })
