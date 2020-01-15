@@ -5,7 +5,8 @@
  * @param {any} x
  * @returns {Boolean}
  */
-const isObject = x => x &&
+const isObject = x =>
+	x != null &&
 	typeof x === 'object' &&
 	x.constructor === Object;
 

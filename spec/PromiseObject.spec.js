@@ -58,19 +58,19 @@ const resolvedObject3 = {
 /* global describe it expect */
 describe("Promise.object", () => {
 
-	it("Should return resolvedObject1", () => {
+	it("Should resolve simple objects with promises", () => {
 		return Promise.object(testObject1)
 			.then(obj => expect(obj).toEqual(resolvedObject1));
-	})
+	});
 
-	it("Should return resolvedObject2", () => {
+	it("Should resolve objects with arrays and promises", () => {
 		return Promise.object(testObject2)
 			.then(obj => expect(obj).toEqual(resolvedObject2));
-	})
+	});
 
-	it("Should return resolvedObject3", () => {
+	it("Should resolve nested promise structures", () => {
 		return Promise.object(testObject3)
 			.then(obj => expect(obj).toEqual(resolvedObject3));
-	})
+	});
 
 })
